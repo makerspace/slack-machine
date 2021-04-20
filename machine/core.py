@@ -77,6 +77,7 @@ class Machine:
     def load_plugins(self):
         with indent(4):
             logger.debug("PLUGINS: %s", self._settings['PLUGINS'])
+            self._plugins = []
             for plugin in self._settings['PLUGINS']:
                 for class_name, cls in import_string(plugin):
                     if issubclass(cls, MachineBasePlugin) and cls is not MachineBasePlugin:
@@ -95,6 +96,7 @@ class Machine:
                             del instance
                         else:
                             instance.init()
+                            self._plugins.append([instance, class_name])
                             show_valid(class_name)
         self._storage.set('manual', dill.dumps(self._help))
 
@@ -135,7 +137,7 @@ class Machine:
             if action == 'process':
                 event_type = config['event_type']
                 RTMClient.on(event=event_type, callback=callable_with_sanitized_event(fn))
-            if action == 'respond_to' or action == 'listen_to':
+            if action in ['respond_to', 'listen_to']:
                 for regex in config['regex']:
                     event_handler = {
                         'class': cls_instance,
@@ -208,4 +210,4 @@ class Machine:
                 )
 
             show_valid("Dispatcher started")
-            self._dispatcher.start()
+            self._dispatcher.start(self._plugins)
