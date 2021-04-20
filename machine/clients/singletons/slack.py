@@ -2,8 +2,8 @@ import logging
 from typing import Callable, Dict, List
 import asyncio
 
-from slack.web.client import WebClient
-from slack.rtm.client import RTMClient
+from slack_sdk.web.client import WebClient
+from slack_sdk.rtm import RTMClient
 
 from clint.textui import puts
 from machine.utils.text import show_valid
