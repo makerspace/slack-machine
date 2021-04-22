@@ -42,6 +42,10 @@ class EventDispatcher:
         if 'user' in event and not event['user'] == self._get_bot_id():
             listeners = self._find_listeners('listen_to')
             respond_to_msg = self._check_bot_mention(event)
+            # Handle message subtype 'message_changed' to allow the bot to respond to edits
+            if 'subtype' in event and event['subtype'] == 'message_changed':
+                event = event['message']
+                event['channel'] = payload['data'].get('channel', '')
             if respond_to_msg:
                 listeners += self._find_listeners('respond_to')
                 self._dispatch_listeners(listeners, respond_to_msg)
